@@ -87,6 +87,11 @@ export async function POST(request) {
       return new Response("Stroke too short", { status: 400 });
     }
 
+    const strokeSize =
+      typeof incoming.size === "number" && incoming.size > 0
+        ? incoming.size
+        : 3;
+
     const stroke = {
       id:
         typeof incoming.id === "number"
@@ -98,6 +103,7 @@ export async function POST(request) {
           : Date.now(),
       points: normalizedPoints,
       color: safeColor,
+      size: strokeSize,
     };
 
     strokes.push(stroke);

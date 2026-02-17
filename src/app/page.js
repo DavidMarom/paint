@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 
 const BRUSH_SIZE = 3;
+const ERASER_SIZE = 7;
+const BACKGROUND_COLOR = "#bbbbbb";
 const COLORS = [
   "#000000",
   "#ff0000",
@@ -21,7 +23,7 @@ export default function Home() {
   const containerRef = useRef(null);
   const [strokes, setStrokes] = useState([]);
   const [brushColor, setBrushColor] = useState(DEFAULT_BRUSH_COLOR);
-  const [tool, setTool] = useState("brush"); // "brush" | "stencil"
+  const [tool, setTool] = useState("brush"); // "brush" | "stencil" | "eraser"
   const currentStrokeRef = useRef(null);
   const isDrawingRef = useRef(false);
 
@@ -137,8 +139,10 @@ export default function Home() {
     };
     currentStrokeRef.current = [normalizedPoint];
 
+    const effectiveColor = tool === "eraser" ? BACKGROUND_COLOR : brushColor;
+    const effectiveSize = tool === "eraser" ? ERASER_SIZE : BRUSH_SIZE;
     const ctx = canvas.getContext("2d");
-    drawStrokeSegment(ctx, [normalizedPoint], canvas, brushColor);
+    drawStrokeSegment(ctx, [normalizedPoint], canvas, effectiveColor, effectiveSize);
   };
 
   const handlePointerMove = (event) => {
@@ -157,8 +161,10 @@ export default function Home() {
     const stroke = currentStrokeRef.current;
     stroke.push(normalizedPoint);
 
+    const effectiveColor = tool === "eraser" ? BACKGROUND_COLOR : brushColor;
+    const effectiveSize = tool === "eraser" ? ERASER_SIZE : BRUSH_SIZE;
     const ctx = canvas.getContext("2d");
-    drawStrokeSegment(ctx, stroke.slice(-2), canvas, brushColor);
+    drawStrokeSegment(ctx, stroke.slice(-2), canvas, effectiveColor, effectiveSize);
   };
 
   const finishStroke = async () => {
@@ -170,13 +176,15 @@ export default function Home() {
 
     if (!stroke || stroke.length < 2) return;
 
-    // Optimistically add to local state
+    const effectiveColor = tool === "eraser" ? BACKGROUND_COLOR : brushColor;
+    const effectiveSize = tool === "eraser" ? ERASER_SIZE : BRUSH_SIZE;
     const newStroke = {
       id: Date.now(),
       type: "stroke",
       points: stroke,
       createdAt: Date.now(),
-      color: brushColor,
+      color: effectiveColor,
+      size: effectiveSize,
     };
     setStrokes((prev) => [...prev, newStroke]);
 
@@ -204,6 +212,16 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <div className={styles.info}>
+        <button
+          type="button"
+          className={`${styles.eraserButton} ${
+            tool === "eraser" ? styles.toolButtonActive : ""
+          }`}
+          onClick={() => setTool((prev) => (prev === "eraser" ? "brush" : "eraser"))}
+          aria-label="Eraser"
+        >
+          <span className={styles.eraserIcon} />
+        </button>
         <div className={styles.palette}>
           {COLORS.map((color) => (
             <button
@@ -226,7 +244,9 @@ export default function Home() {
           className={`${styles.toolButton} ${
             tool === "stencil" ? styles.toolButtonActive : ""
           }`}
-          onClick={() => setTool((prev) => (prev === "stencil" ? "brush" : "stencil"))}
+          onClick={() => {
+            setTool((prev) => (prev === "stencil" ? "brush" : "stencil"));
+          }}
         >
           <span className={styles.toolIconWrapper}>
             <img src="/sb.png" alt="Stencil" className={styles.toolIcon} />
@@ -270,20 +290,21 @@ function redraw(ctx, strokes, canvas, stencilImage) {
 
   for (const stroke of strokes) {
     const color = stroke.color || DEFAULT_BRUSH_COLOR;
+    const size = stroke.size ?? BRUSH_SIZE;
     if (stroke.type === "stencil" && stroke.position) {
       drawStencil(ctx, stroke.position, canvas, stencilImage);
     } else {
-      drawStrokeSegment(ctx, stroke.points, canvas, color);
+      drawStrokeSegment(ctx, stroke.points, canvas, color, size);
     }
   }
 }
 
-function drawStrokeSegment(ctx, points, canvas, color = DEFAULT_BRUSH_COLOR) {
+function drawStrokeSegment(ctx, points, canvas, color = DEFAULT_BRUSH_COLOR, lineWidth = BRUSH_SIZE) {
   if (!ctx || !canvas || !points || points.length === 0) return;
   const rect = canvas.getBoundingClientRect();
 
   ctx.strokeStyle = color;
-  ctx.lineWidth = BRUSH_SIZE;
+  ctx.lineWidth = lineWidth;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 

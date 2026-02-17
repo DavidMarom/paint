@@ -45,6 +45,27 @@
   box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(0, 0, 0, 0.7);
 }
 
+.eraserButton {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 0;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eraserIcon {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #bbbbbb;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+
 .toolButton {
   border-radius: 999px;
   border: 1px solid rgba(0, 0, 0, 0.3);
