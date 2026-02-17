@@ -4,13 +4,23 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 
 const BRUSH_SIZE = 3;
-const BRUSH_COLOR = "#000000";
+const COLORS = [
+  "#000000",
+  "#ff0000",
+  "#ffa500",
+  "#ffff00",
+  "#00aa00",
+  "#0066ff",
+  "#8000ff",
+];
+const DEFAULT_BRUSH_COLOR = COLORS[0];
 const POLL_INTERVAL_MS = 5000;
 
 export default function Home() {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [strokes, setStrokes] = useState([]);
+  const [brushColor, setBrushColor] = useState(DEFAULT_BRUSH_COLOR);
   const currentStrokeRef = useRef(null);
   const isDrawingRef = useRef(false);
 
@@ -83,7 +93,7 @@ export default function Home() {
     currentStrokeRef.current = [normalizedPoint];
 
     const ctx = canvas.getContext("2d");
-    drawStrokeSegment(ctx, [normalizedPoint], canvas);
+    drawStrokeSegment(ctx, [normalizedPoint], canvas, brushColor);
   };
 
   const handlePointerMove = (event) => {
@@ -102,7 +112,7 @@ export default function Home() {
     stroke.push(normalizedPoint);
 
     const ctx = canvas.getContext("2d");
-    drawStrokeSegment(ctx, stroke.slice(-2), canvas);
+    drawStrokeSegment(ctx, stroke.slice(-2), canvas, brushColor);
   };
 
   const finishStroke = async () => {
@@ -118,6 +128,7 @@ export default function Home() {
       id: Date.now(),
       points: stroke,
       createdAt: Date.now(),
+      color: brushColor,
     };
     setStrokes((prev) => [...prev, newStroke]);
 
@@ -145,11 +156,20 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <div className={styles.info}>
-        <h1>Paint</h1>
-        <p>Draw anywhere. Everyone shares the same canvas.</p>
-        <p className={styles.subtle}>
-          Simple 3px black brush. Updates sync every few seconds.
-        </p>
+        <div className={styles.palette}>
+          {COLORS.map((color) => (
+            <button
+              key={color}
+              type="button"
+              className={`${styles.swatch} ${
+                brushColor === color ? styles.swatchSelected : ""
+              }`}
+              style={{ backgroundColor: color }}
+              onClick={() => setBrushColor(color)}
+              aria-label={`Select color ${color}`}
+            />
+          ))}
+        </div>
       </div>
       <div className={styles.canvasContainer} ref={containerRef}>
         <canvas
@@ -187,15 +207,16 @@ function redraw(ctx, strokes, canvas) {
   ctx.clearRect(0, 0, rect.width, rect.height);
 
   for (const stroke of strokes) {
-    drawStrokeSegment(ctx, stroke.points, canvas);
+    const color = stroke.color || DEFAULT_BRUSH_COLOR;
+    drawStrokeSegment(ctx, stroke.points, canvas, color);
   }
 }
 
-function drawStrokeSegment(ctx, points, canvas) {
+function drawStrokeSegment(ctx, points, canvas, color = DEFAULT_BRUSH_COLOR) {
   if (!ctx || !canvas || !points || points.length === 0) return;
   const rect = canvas.getBoundingClientRect();
 
-  ctx.strokeStyle = BRUSH_COLOR;
+  ctx.strokeStyle = color;
   ctx.lineWidth = BRUSH_SIZE;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";

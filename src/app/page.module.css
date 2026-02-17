@@ -12,30 +12,37 @@
   position: absolute;
   top: 16px;
   left: 16px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-width: min(420px, 90vw);
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 }
 
-.info h1 {
-  font-size: 16px;
-  font-weight: 600;
+.palette {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
 }
 
-.info p {
-  font-size: 12px;
-  line-height: 1.4;
+.swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  background-clip: padding-box;
 }
 
-.subtle {
-  opacity: 0.7;
+.swatchSelected {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(0, 0, 0, 0.7);
 }
 
 .canvasContainer {
