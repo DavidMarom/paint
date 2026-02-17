@@ -34,6 +34,11 @@ export async function POST(request) {
       return new Response("Stroke too short", { status: 400 });
     }
 
+    const safeColor =
+      typeof incoming.color === "string" && incoming.color.trim()
+        ? incoming.color
+        : "#000000";
+
     const stroke = {
       id:
         typeof incoming.id === "number"
@@ -44,6 +49,7 @@ export async function POST(request) {
           ? incoming.createdAt
           : Date.now(),
       points: normalizedPoints,
+      color: safeColor,
     };
 
     strokes.push(stroke);
