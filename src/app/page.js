@@ -21,8 +21,20 @@ export default function Home() {
   const containerRef = useRef(null);
   const [strokes, setStrokes] = useState([]);
   const [brushColor, setBrushColor] = useState(DEFAULT_BRUSH_COLOR);
+  const [tool, setTool] = useState("brush"); // "brush" | "stencil"
   const currentStrokeRef = useRef(null);
   const isDrawingRef = useRef(false);
+
+  const stencilImageRef = useRef(null);
+
+  // Load stencil image
+  useEffect(() => {
+    const img = new Image();
+    img.src = "/sb.png";
+    img.onload = () => {
+      stencilImageRef.current = img;
+    };
+  }, []);
 
   // Resize canvas to fill the container
   useEffect(() => {
@@ -40,7 +52,7 @@ export default function Home() {
 
       const ctx = canvas.getContext("2d");
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      redraw(ctx, strokes, canvas);
+      redraw(ctx, strokes, canvas, stencilImageRef.current);
     };
 
     resize();
@@ -62,7 +74,7 @@ export default function Home() {
           const canvas = canvasRef.current;
           if (canvas) {
             const ctx = canvas.getContext("2d");
-            redraw(ctx, data.strokes, canvas);
+            redraw(ctx, data.strokes, canvas, stencilImageRef.current);
           }
         }
       } catch {
@@ -85,6 +97,39 @@ export default function Home() {
     const point = getPointFromEvent(event, rect);
     if (!point) return;
 
+    // Stencil mode: stamp once per click
+    if (tool === "stencil") {
+      const position = {
+        x: point.x / rect.width,
+        y: point.y / rect.height,
+      };
+
+      const ctx = canvas.getContext("2d");
+      drawStencil(ctx, position, canvas, stencilImageRef.current);
+
+      const stencilPlacement = {
+        id: Date.now(),
+        type: "stencil",
+        position,
+        color: brushColor,
+        createdAt: Date.now(),
+      };
+
+      setStrokes((prev) => [...prev, stencilPlacement]);
+
+      fetch("/api/strokes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ stroke: stencilPlacement }),
+      }).catch(() => {
+        // ignore network errors for this simple demo
+      });
+
+      return;
+    }
+
     isDrawingRef.current = true;
     const normalizedPoint = {
       x: point.x / rect.width,
@@ -97,6 +142,7 @@ export default function Home() {
   };
 
   const handlePointerMove = (event) => {
+    if (tool === "stencil") return;
     if (!isDrawingRef.current || !currentStrokeRef.current) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -116,6 +162,7 @@ export default function Home() {
   };
 
   const finishStroke = async () => {
+    if (tool === "stencil") return;
     if (!isDrawingRef.current || !currentStrokeRef.current) return;
     isDrawingRef.current = false;
     const stroke = currentStrokeRef.current;
@@ -126,6 +173,7 @@ export default function Home() {
     // Optimistically add to local state
     const newStroke = {
       id: Date.now(),
+      type: "stroke",
       points: stroke,
       createdAt: Date.now(),
       color: brushColor,
@@ -165,11 +213,25 @@ export default function Home() {
                 brushColor === color ? styles.swatchSelected : ""
               }`}
               style={{ backgroundColor: color }}
-              onClick={() => setBrushColor(color)}
+              onClick={() => {
+                setBrushColor(color);
+                setTool("brush");
+              }}
               aria-label={`Select color ${color}`}
             />
           ))}
         </div>
+        <button
+          type="button"
+          className={`${styles.toolButton} ${
+            tool === "stencil" ? styles.toolButtonActive : ""
+          }`}
+          onClick={() => setTool((prev) => (prev === "stencil" ? "brush" : "stencil"))}
+        >
+          <span className={styles.toolIconWrapper}>
+            <img src="/sb.png" alt="Stencil" className={styles.toolIcon} />
+          </span>
+        </button>
       </div>
       <div className={styles.canvasContainer} ref={containerRef}>
         <canvas
@@ -200,7 +262,7 @@ function getPointFromEvent(event, rect) {
   };
 }
 
-function redraw(ctx, strokes, canvas) {
+function redraw(ctx, strokes, canvas, stencilImage) {
   if (!ctx || !canvas) return;
 
   const rect = canvas.getBoundingClientRect();
@@ -208,7 +270,11 @@ function redraw(ctx, strokes, canvas) {
 
   for (const stroke of strokes) {
     const color = stroke.color || DEFAULT_BRUSH_COLOR;
-    drawStrokeSegment(ctx, stroke.points, canvas, color);
+    if (stroke.type === "stencil" && stroke.position) {
+      drawStencil(ctx, stroke.position, canvas, stencilImage);
+    } else {
+      drawStrokeSegment(ctx, stroke.points, canvas, color);
+    }
   }
 }
 
@@ -228,4 +294,18 @@ function drawStrokeSegment(ctx, points, canvas, color = DEFAULT_BRUSH_COLOR) {
     ctx.lineTo(p.x * rect.width, p.y * rect.height);
   }
   ctx.stroke();
+}
+
+function drawStencil(ctx, position, canvas, image) {
+  if (!ctx || !canvas || !position || !image) return;
+  const rect = canvas.getBoundingClientRect();
+  const centerX = position.x * rect.width;
+  const centerY = position.y * rect.height;
+
+  const maxSize = Math.min(rect.width, rect.height) * 0.12;
+  const scale = maxSize / image.width;
+  const width = image.width * scale;
+  const height = image.height * scale;
+
+  ctx.drawImage(image, centerX - width / 2, centerY - height / 2, width, height);
 }

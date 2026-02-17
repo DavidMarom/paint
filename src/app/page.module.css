@@ -45,6 +45,37 @@
   box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(0, 0, 0, 0.7);
 }
 
+.toolButton {
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.toolButtonActive {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.toolIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolIcon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
 .canvasContainer {
   width: 100%;
   height: 100%;
