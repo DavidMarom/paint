@@ -257,6 +257,22 @@ export default function Home() {
         </button>
         <button
           type="button"
+          className={styles.toolButton}
+          onClick={() => {
+            const isMac =
+              typeof navigator !== "undefined" &&
+              /Mac/i.test(navigator.platform || "");
+            const shortcut = isMac ? "⌘ + D" : "Ctrl + D";
+            alert(`To bookmark this site, press ${shortcut} in your browser.`);
+          }}
+        >
+          <span aria-hidden="true" className={styles.bookmarkIcon}>
+            ★
+          </span>
+          {/* <span className="sr-only">Bookmark this site</span> */}
+        </button>
+        <button
+          type="button"
           className={`${styles.toolButton} ${styles.shareButton}`}
           onClick={() => {
             const text =

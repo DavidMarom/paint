@@ -102,6 +102,11 @@
   border-color: #0b645c;
 }
 
+.bookmarkIcon {
+  color: #ffd700;
+  font-size: 14px;
+}
+
 .toolIconWrapper {
   display: inline-flex;
   align-items: center;
