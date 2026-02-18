@@ -96,6 +96,12 @@
   border-color: #000000;
 }
 
+.shareButton {
+  background: #128c7e;
+  color: #ffffff;
+  border-color: #0b645c;
+}
+
 .toolIconWrapper {
   display: inline-flex;
   align-items: center;

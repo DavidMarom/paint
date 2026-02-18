@@ -255,6 +255,19 @@ export default function Home() {
             <img src="/sb.png" alt="Stencil" className={styles.toolIcon} />
           </span>
         </button>
+        <button
+          type="button"
+          className={`${styles.toolButton} ${styles.shareButton}`}
+          onClick={() => {
+            const text =
+              "Paint together with me at https://www.paintogether.live/";
+            const url =
+              "https://wa.me/?text=" + encodeURIComponent(text);
+            window.open(url, "_blank");
+          }}
+        >
+          Share
+        </button>
       </div>
       <div className={styles.canvasContainer} ref={containerRef}>
         <canvas
