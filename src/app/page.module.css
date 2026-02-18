@@ -8,6 +8,18 @@
   font-family: var(--font-geist-sans);
 }
 
+.pageTitle {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+  pointer-events: none;
+}
+
 .info {
   position: absolute;
   top: 16px;

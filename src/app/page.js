@@ -211,6 +211,9 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
+      <main>
+        <h1 className={styles.pageTitle}>Paint together</h1>
+      </main>
       <div className={styles.info}>
         <button
           type="button"

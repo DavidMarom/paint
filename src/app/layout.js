@@ -12,8 +12,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Paint",
-  description: "Simple shared drawing canvas",
+  title: "Paint Together – Collaborative Drawing Online",
+  description: "On this website you can paint together with others. Share a collaborative drawing canvas in real time—draw, use stamps, and create art with friends.",
+  keywords: ["paint together", "collaborative drawing", "draw online", "shared canvas", "paint with others"],
+  openGraph: {
+    title: "Paint Together – Collaborative Drawing Online",
+    description: "On this website you can paint together with others. Share a collaborative drawing canvas in real time.",
+    type: "website",
+  },
   icons: {
     icon: "/favicon/favicon.ico",
     shortcut: "/favicon/favicon.ico",
