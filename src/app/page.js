@@ -93,6 +93,9 @@ export default function Home() {
   }, []);
 
   const handlePointerDown = (event) => {
+    if (event.cancelable) {
+      event.preventDefault();
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -146,6 +149,9 @@ export default function Home() {
   };
 
   const handlePointerMove = (event) => {
+    if (event.cancelable) {
+      event.preventDefault();
+    }
     if (tool === "stencil") return;
     if (!isDrawingRef.current || !currentStrokeRef.current) return;
     const canvas = canvasRef.current;
