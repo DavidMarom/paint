@@ -36,6 +36,36 @@
   gap: 8px;
 }
 
+.actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .info {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .actions {
+    top: 60px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+
 .palette {
   display: flex;
   flex-direction: row;

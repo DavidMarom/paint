@@ -255,6 +255,8 @@ export default function Home() {
             <img src="/sb.png" alt="Stencil" className={styles.toolIcon} />
           </span>
         </button>
+      </div>
+      <div className={styles.actions}>
         <button
           type="button"
           className={styles.toolButton}
@@ -269,7 +271,6 @@ export default function Home() {
           <span aria-hidden="true" className={styles.bookmarkIcon}>
             ★
           </span>
-          {/* <span className="sr-only">Bookmark this site</span> */}
         </button>
         <button
           type="button"
